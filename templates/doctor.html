@@ -1,0 +1,16 @@
+<h2>Doctor Dashboard</h2>
+
+{% if tokens %}
+<p>Current Patient: Token {{ tokens[0][1] }} - {{ tokens[0][2] }}</p>
+<form method="POST" action="/next">
+    <button type="submit">Next Patient</button>
+</form>
+<h3>Upcoming Patients</h3>
+<ul>
+{% for token in tokens[1:] %}
+    <li>Token {{ token[1] }} - {{ token[2] }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No patients waiting</p>
+{% endif %}
