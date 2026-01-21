@@ -1,7 +1,30 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
+import os
+from dotenv import load_dotenv
+from twilio.rest import Client
 
 app = Flask(__name__)
+
+# Load environment variables
+load_dotenv()
+
+# Debug: Print Twilio credentials
+TWILIO_SID = os.getenv("TWILIO_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE = os.getenv("TWILIO_PHONE")
+
+print("SID:", TWILIO_SID)
+print("TOKEN:", TWILIO_AUTH_TOKEN)
+print("PHONE:", TWILIO_PHONE)
+
+# Twilio configuration
+TWILIO_SID = os.getenv("TWILIO_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE = os.getenv("TWILIO_PHONE")
+
+# Initialize Twilio client
+client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
 
 def get_db():
     return sqlite3.connect("database.db")
@@ -30,6 +53,18 @@ def generate_token():
 
     conn.commit()
     conn.close()
+
+    # Prepare SMS body
+    sms_body = f"Your token number is {token_number}. Please wait for your turn."
+    try:
+        client.messages.create(
+            body=sms_body,
+            from_=TWILIO_PHONE,
+            to=f"+91{mobile}"
+        )
+        print("SMS sent successfully")
+    except Exception as e:
+        print("SMS ERROR:", e)
 
     return f"Token Generated Successfully. Your Token Number is {token_number}"
 
